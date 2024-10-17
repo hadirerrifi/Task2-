@@ -1,0 +1,85 @@
+#include <iostream>
+#include <vector>
+#include <numeric>  // Include this for accumulate
+
+using namespace std;
+
+// Function to calculate grade points for a course
+double calculateGradePoint(double grade, double credits) {
+    return grade * credits;
+}
+
+// Function to calculate SGPA for a semester
+double calculateSGPA(vector<double> grades, vector<double> credits) {
+    double totalCredits = 0;
+    double totalGradePoints = 0;
+
+    for (int i = 0; i < grades.size(); i++) {
+        totalGradePoints += calculateGradePoint(grades[i], credits[i]);
+        totalCredits += credits[i];
+    }
+
+    return totalCredits == 0 ? 0 : totalGradePoints / totalCredits;
+}
+
+// Function to calculate CGPA based on multiple semesters
+double calculateCGPA(vector<double> sgpas, vector<double> creditsPerSemester) {
+    double totalCredits = 0;
+    double weightedSGPA = 0;
+
+    for (int i = 0; i < sgpas.size(); i++) {
+        weightedSGPA += sgpas[i] * creditsPerSemester[i];
+        totalCredits += creditsPerSemester[i];
+    }
+
+    return totalCredits == 0 ? 0 : weightedSGPA / totalCredits;
+}
+
+// Function to get input for a semester
+void inputSemesterData(vector<double>& grades, vector<double>& credits) {
+    int numCourses;
+    cout << "Enter the number of courses taken: ";
+    cin >> numCourses;
+
+    for (int i = 0; i < numCourses; i++) {
+        double grade, credit;
+        cout << "Enter the grade earned for course " << i + 1 << " (on a 4.0 scale): ";
+        cin >> grade;
+        cout << "Enter the credit hours for course " << i + 1 << ": ";
+        cin >> credit;
+        grades.push_back(grade);
+        credits.push_back(credit);
+    }
+}
+
+// Main CGPA Calculator function
+void cgpaCalculator() {
+    int semesters;
+    cout << "Enter the number of semesters: ";
+    cin >> semesters;
+
+    vector<double> allSGPAs;
+    vector<double> creditsPerSemester;
+
+    for (int i = 0; i < semesters; i++) {
+        cout << "\n--- Enter data for Semester " << i + 1 << " ---\n";
+
+        vector<double> grades, credits;
+        inputSemesterData(grades, credits);
+
+        double sgpa = calculateSGPA(grades, credits);
+        cout << "SGPA for Semester " << i + 1 << ": " << sgpa << endl;
+
+        allSGPAs.push_back(sgpa);
+        creditsPerSemester.push_back(accumulate(credits.begin(), credits.end(), 0.0));  // Using accumulate
+    }
+
+    double cgpa = calculateCGPA(allSGPAs, creditsPerSemester);
+    cout << "\nCumulative Grade Point Average (CGPA): " << cgpa << endl;
+}
+
+// Main function
+int main() {
+    cgpaCalculator();
+    return 0;
+}
